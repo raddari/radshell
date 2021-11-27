@@ -1,5 +1,0 @@
-/mnt/e/code/c/radshell/build/CMakeFiles/rebuild_cache.dir
-/mnt/e/code/c/radshell/build/CMakeFiles/edit_cache.dir
-/mnt/e/code/c/radshell/build/CMakeFiles/radshell.dir
-/mnt/e/code/c/radshell/build/src/CMakeFiles/rebuild_cache.dir
-/mnt/e/code/c/radshell/build/src/CMakeFiles/edit_cache.dir
