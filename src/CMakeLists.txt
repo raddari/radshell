@@ -1,2 +1,4 @@
 target_sources(radshell PRIVATE
-  main.c)
+  main.c
+  rsio.c
+  rsio.h)

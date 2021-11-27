@@ -1,3 +1,5 @@
+#include "rsio.h"
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,11 +15,7 @@ int main() {
   printf(PROMPT);
 
   char line[LINE_LIMIT];
-  fgets(line, sizeof line, stdin);
-  char *newline = strchr(line, '\n');
-  if (newline) {
-    *newline = '\0';
-  }
+  rs_read_line(line, sizeof line, stdin);
 
   printf("User typed: %s\n", line);
 
