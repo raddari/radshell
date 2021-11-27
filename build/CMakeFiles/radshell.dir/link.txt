@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/radshell.dir/src/main.c.o -o radshell 
