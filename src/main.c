@@ -1,5 +1,7 @@
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
@@ -12,16 +14,18 @@ int main() {
 
   char line[LINE_LIMIT];
   fgets(line, sizeof line, stdin);
+  char *newline = strchr(line, '\n');
+  if (newline) {
+    *newline = '\0';
+  }
 
   printf("User typed: %s\n", line);
 
   int pid = fork();
   if (pid > 0) {
-    // Parent
     int status;
     waitpid(pid, &status, 0);
   } else if (pid == 0) {
-    // Child
     char *args[] = {
       line,
       NULL,
@@ -29,8 +33,7 @@ int main() {
     execvp(line, args);
     perror("execvp"); // Not reached if exec succeeds
   } else {
-    // Error
     perror("fork");
   }
-  return 0;
+  return EXIT_SUCCESS;
 }
