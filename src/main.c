@@ -11,27 +11,34 @@
 #define LINE_LIMIT 256
 
 
+static void print_command(const struct Command *cmd);
+
+
 int main() {
   printf(PROMPT);
 
   char line[LINE_LIMIT];
   rs_read_line(line, sizeof line, stdin);
-
-  printf("User typed: %s\n", line);
+  struct Command cmd = rs_command_from_str(line);
+  print_command(&cmd);
 
   int pid = fork();
   if (pid > 0) {
     int status;
     waitpid(pid, &status, 0);
   } else if (pid == 0) {
-    char *args[] = {
-      line,
-      NULL,
-    };
-    execvp(line, args);
+    execvp(cmd.argv[0], cmd.argv);
     perror("execvp"); // Not reached if exec succeeds
   } else {
     perror("fork");
   }
   return EXIT_SUCCESS;
+}
+
+static void print_command(const struct Command *cmd) {
+  printf("Command{argc=%d, argv={\n", cmd->argc);
+  for (int i = 0; i < cmd->argc; i++) {
+    printf("    \"%s\",\n", cmd->argv[i]);
+  }
+  printf("  }\n}\n");
 }
