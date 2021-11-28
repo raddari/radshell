@@ -15,22 +15,26 @@ static void print_command(const struct Command *cmd);
 
 
 int main() {
-  printf(PROMPT);
+  // TODO(raddari): implement cd
+  // FIXME(raddari): !feof(stdin) kinda borked
+  while (!feof(stdin)) {
+    printf(PROMPT);
 
-  char line[LINE_LIMIT];
-  rs_read_line(line, sizeof line, stdin);
-  struct Command cmd = rs_command_from_str(line);
-  print_command(&cmd);
+    char line[LINE_LIMIT];
+    rs_read_line(line, sizeof line, stdin);
+    struct Command cmd = rs_command_from_str(line);
+    print_command(&cmd);
 
-  int pid = fork();
-  if (pid > 0) {
-    int status;
-    waitpid(pid, &status, 0);
-  } else if (pid == 0) {
-    execvp(cmd.argv[0], cmd.argv);
-    perror("execvp"); // Not reached if exec succeeds
-  } else {
-    perror("fork");
+    int pid = fork();
+    if (pid > 0) {
+      int status;
+      waitpid(pid, &status, 0);
+    } else if (pid == 0) {
+      execvp(cmd.argv[0], cmd.argv);
+      perror("execvp"); // Not reached if exec succeeds
+    } else {
+      perror("fork");
+    }
   }
   return EXIT_SUCCESS;
 }
