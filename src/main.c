@@ -11,11 +11,11 @@
 #define LINE_LIMIT 256
 
 
+static int fork_and_execute(const struct Command *cmd);
 static void print_command(const struct Command *cmd);
 
 
 int main() {
-  // TODO(raddari): implement cd
   // FIXME(raddari): !feof(stdin) kinda borked
   while (!feof(stdin)) {
     printf(PROMPT);
@@ -23,20 +23,38 @@ int main() {
     char line[LINE_LIMIT];
     rs_read_line(line, sizeof line, stdin);
     struct Command cmd = rs_command_from_str(line);
-    print_command(&cmd);
 
-    int pid = fork();
-    if (pid > 0) {
-      int status;
-      waitpid(pid, &status, 0);
-    } else if (pid == 0) {
-      execvp(cmd.argv[0], cmd.argv);
-      perror("execvp"); // Not reached if exec succeeds
+#ifdef DEBUG
+    print_command(&cmd);
+#endif
+
+    if (strcmp("cd", cmd.argv[0]) == 0) {
+      /// TODO(raddari): implement cd
     } else {
-      perror("fork");
+      int result = fork_and_execute(&cmd);
     }
   }
   return EXIT_SUCCESS;
+}
+
+static int fork_and_execute(const struct Command *cmd) {
+    int pid = fork();
+    if (pid > 0) {
+      int wstatus;
+      waitpid(pid, &wstatus, 0);
+      if (WIFEXITED(wstatus)) {
+        return WEXITSTATUS(wstatus);
+      } else {
+        return -1;
+      }
+    } else if (pid == 0) {
+      int result = execvp(cmd->argv[0], cmd->argv);
+      perror("execvp"); // Not reached if exec succeeds
+      return result;
+    } else {
+      perror("fork");
+      return pid;
+    }
 }
 
 static void print_command(const struct Command *cmd) {
