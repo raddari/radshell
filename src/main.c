@@ -45,6 +45,7 @@ int main(int argc, char **argv) {
     } else {
       result = fork_and_execute(&cmd);
     }
+    rs_command_free_args(&cmd);
   }
   return EXIT_SUCCESS;
 }
