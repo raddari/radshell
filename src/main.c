@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define PROMPT "> "
 #define LINE_LIMIT 256
 
 
@@ -16,13 +15,23 @@ static int change_dir(const struct Command *cmd);
 static void print_command(const struct Command *cmd);
 
 
-int main() {
-  // FIXME(raddari): !feof(stdin) kinda borked
-  while (!feof(stdin)) {
-    printf(PROMPT);
+int main(int argc, char **argv) {
+  FILE *in;
+  // TODO(raddari): Handle args properly
+  if (argc == 2) {
+    in = fopen(argv[1], "r");
+    if (!in) {
+      fprintf(stderr, "Invalid file: %s\n", argv[1]);
+      return EXIT_FAILURE;
+    }
+  } else {
+    in = stdin;
+  }
 
+  // FIXME(raddari): !feof(stdin) kinda borked
+  while (!feof(in)) {
     char line[LINE_LIMIT];
-    rs_read_line(line, sizeof line, stdin);
+    rs_read_line(line, sizeof line, in);
     struct Command cmd = rs_command_from_str(line);
 
 #ifdef DEBUG
@@ -62,7 +71,6 @@ static int fork_and_execute(const struct Command *cmd) {
 
 static int change_dir(const struct Command *cmd) {
   if (cmd->argc > 1) {
-    // TODO(raddari): Comply with `man cd`
     return chdir(cmd->argv[1]);
   } else {
     // TODO(raddari): Proper error code
