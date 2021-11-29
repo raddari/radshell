@@ -12,6 +12,7 @@
 
 
 static int fork_and_execute(const struct Command *cmd);
+static int change_dir(const struct Command *cmd);
 static void print_command(const struct Command *cmd);
 
 
@@ -28,10 +29,12 @@ int main() {
     print_command(&cmd);
 #endif
 
+    int result;
     if (strcmp("cd", cmd.argv[0]) == 0) {
-      /// TODO(raddari): implement cd
+      // TODO(raddari): implement cd
+      result = change_dir(&cmd);
     } else {
-      int result = fork_and_execute(&cmd);
+      result = fork_and_execute(&cmd);
     }
   }
   return EXIT_SUCCESS;
@@ -55,6 +58,16 @@ static int fork_and_execute(const struct Command *cmd) {
       perror("fork");
       return pid;
     }
+}
+
+static int change_dir(const struct Command *cmd) {
+  if (cmd->argc > 1) {
+    // TODO(raddari): Comply with `man cd`
+    return chdir(cmd->argv[1]);
+  } else {
+    // TODO(raddari): Proper error code
+    return 0;
+  }
 }
 
 static void print_command(const struct Command *cmd) {
